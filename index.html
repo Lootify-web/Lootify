@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lootify | Login</title>
-<link rel="icon" href="rrr.png">
+<link rel="icon" href="rrrr.png">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Geneva,sans-serif}
@@ -12,37 +12,22 @@ body{
     background:#F2DC91;
     height:100vh;
     display:flex;
-    align-items:center;
     justify-content:center;
-}
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    align-items:center;
 }
 
-.login-box{
-    animation: fadeUp 0.8s ease;
-}
-
- 
-
-/* MUSIC BUTTON */
+/* MUSIC BUTTON - RIGHT PAGE */
 #musicBtn{
-    position:fixed;
-    top:15px;
-    right:20px;
-    font-size:40px;
-    cursor:pointer;
-    user-select:none;
-    transition:.3s;
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    font-size: 42px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 9999;
+    transition: transform 0.3s;
 }
-#musicBtn:hover{transform:scale(1.2)}
+#musicBtn:hover{transform: scale(1.2) rotate(10deg);}
 
 /* LOGIN BOX */
 .login-box{
@@ -52,11 +37,14 @@ body{
     border-radius:14px;
     text-align:center;
     box-shadow:0 0 25px rgba(0,0,0,.3);
+    animation: fadeUp 0.8s ease;
+    position: relative;
 }
 
 .login-box img{
     width:130px;
     margin-bottom:15px;
+    animation: pop 0.7s ease;
 }
 
 .login-box h2{
@@ -77,63 +65,84 @@ body{
     width:100%;
     padding:12px;
     margin-top:10px;
-    background:#898989;
-    color:white;
     border:none;
     border-radius:7px;
     font-size:16px;
     font-weight:bold;
     cursor:pointer;
-    transition:.3s;
+    transition: transform .2s, box-shadow .2s;
 }
-.login-box button:hover{background:#BBBBBB}
 
-.login-box .google{
-    background:#898989;
+.login-box button:hover{
+    transform: scale(1.05);
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
 }
-.login-box .google:hover{
-    background:#bbbbbb;
+
+/* NORMAL LOGIN BUTTON */
+.login-box .normal{
+    background:#898989;
+    color:white;
+}
+
+/* GOOGLE LOGIN BUTTON */
+.login-box .google{
+    background:#AAAAAA; /* Grey */
+    color:white;
 }
 
 .login-box hr{
     margin:18px 0;
     border:1px solid #ccc;
 }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+    from {opacity:0; transform:translateY(40px);}
+    to {opacity:1; transform:translateY(0);}
+}
+@keyframes pop{
+    0% {transform:scale(0.5); opacity:0;}
+    100% {transform:scale(1); opacity:1;}
+}
 </style>
 </head>
 
 <body>
 
-<!-- MUSIC -->
+<!-- MUSIC BUTTON -->
 <div id="musicBtn">🔈</div>
-<audio id="music" src="wow.mp3" loop muted></audio>
+<audio id="music" src="wow.mp3" loop muted autoplay></audio>
 
 <script>
 const music = document.getElementById("music");
 const btn = document.getElementById("musicBtn");
 
-btn.onclick = () =>{
+btn.onclick = () => {
     music.muted = !music.muted;
     btn.textContent = music.muted ? "🔈" : "🔊";
     music.play();
 };
 </script>
 
-<!-- LOGIN -->
+<!-- LOGIN BOX -->
 <div class="login-box">
     <img src="gg.png" alt="Lootify Logo">
-    
+   
+
+    <!-- Normal Login -->
     <form onsubmit="login(event)">
         <input id="user" type="text" placeholder="Username" required>
         <input type="password" placeholder="Password" required>
-        <button>Log in</button>
+        <button class="normal" type="submit">Log in</button>
     </form>
 
     <hr>
 
+    <!-- Google Login -->
     <button class="google" onclick="googleLogin()">Login with Google</button>
 </div>
 
+<!-- Firebase Google Auth -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
@@ -149,7 +158,7 @@ const provider = new GoogleAuthProvider();
 
 window.googleLogin = function(){
     signInWithPopup(auth,provider)
-    .then((res)=>{
+    .then(res=>{
         localStorage.setItem("loggedIn","true");
         localStorage.setItem("username",res.user.displayName);
         window.location.href="main.html";
@@ -168,12 +177,7 @@ function login(e){
 }
 </script>
 
-
 </body>
 </html>
-
-
-
-
 
 
