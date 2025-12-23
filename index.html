@@ -161,7 +161,7 @@ window.googleLogin = function(){
     .then(res=>{
         localStorage.setItem("loggedIn","true");
         localStorage.setItem("username",res.user.displayName);
-        window.location.href="main.html";
+        window.location.href="Lootify.1.html";
     })
     .catch(e=>alert(e.message));
 };
@@ -173,11 +173,12 @@ function login(e){
     const user = document.getElementById("user").value;
     localStorage.setItem("loggedIn","true");
     localStorage.setItem("username",user);
-    window.location.href="main.html";
+    window.location.href="Lootify.html";
 }
 </script>
 
 </body>
 </html>
+
 
 
