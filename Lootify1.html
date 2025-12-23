@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lootify | Main</title>
+<link rel="icon" href="rrrr.png">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Geneva,sans-serif}
+body{background:#F2DC91;color:#000}
+
+/* HEADER */
+header{
+    background:#222;
+    color:white;
+    padding:15px 30px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+header img{height:45px}
+nav a{
+    color:white;
+    margin:0 15px;
+    text-decoration:none;
+    font-size:22px;
+    font-weight:bold;
+}
+nav a:hover{color:#F2DC91}
+
+.user-box{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+.user-box span{font-size:16px}
+.user-box button{
+    padding:6px 12px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* BANNER */
+.banner{
+    height:260px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:32px;
+    font-weight:bold;
+    color:white;
+    background:linear-gradient(90deg,#222,#555);
+}
+
+/* PRODUCTS */
+.products{
+    padding:40px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:25px;
+}
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 5px 10px rgba(0,0,0,.2);
+}
+.card h3{margin-bottom:10px}
+.card button{
+    margin-top:10px;
+    padding:8px 14px;
+    border:none;
+    background:#222;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+.card button:hover{
+    background:#F2DC91;
+    color:black;
+}
+
+/* CART */
+.cart{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#222;
+    color:white;
+    padding:15px;
+    border-radius:50%;
+    cursor:pointer;
+}
+.cart span{
+    position:absolute;
+    top:-5px;
+    right:-5px;
+    background:white;
+    color:black;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 PROTECTION -->
+<script>
+if(localStorage.getItem("loggedIn")!=="true"){
+    window.location.href="login.html";
+}
+</script>
+
+<header>
+    <img src="rrrr.png">
+    <nav>
+        <a href="#">Mouse</a>
+        <a href="#">Keyboard</a>
+        <a href="#">Headphones</a>
+        <a href="#">Contact Us!</a>
+    </nav>
+
+    <div class="user-box">
+        <span id="username">Welcome</span>
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<div class="banner">
+    Best Gaming Deals 🔥
+</div>
+
+<section class="products">
+    <div class="card">
+        <h3>Gaming Mouse</h3>
+        <button onclick="addToCart('Mouse')">Add to cart</button>
+    </div>
+    <div class="card">
+        <h3>Mechanical Keyboard</h3>
+        <button onclick="addToCart('Keyboard')">Add to cart</button>
+    </div>
+    <div class="card">
+        <h3>Headphones</h3>
+        <button onclick="addToCart('Headphones')">Add to cart</button>
+    </div>
+</section>
+
+<div class="cart" onclick="showCart()">
+    🛒
+    <span id="count">0</span>
+</div>
+
+<script>
+/* USERNAME */
+const name = localStorage.getItem("username") || "Player";
+document.getElementById("username").innerText = "Hi, " + name;
+
+/* CART */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+updateCount();
+
+function addToCart(item){
+    cart.push(item);
+    localStorage.setItem("cart",JSON.stringify(cart));
+    updateCount();
+}
+
+function updateCount(){
+    document.getElementById("count").innerText = cart.length;
+}
+
+function showCart(){
+    alert("Cart items:\n" + cart.join(", "));
+}
+
+/* LOGOUT */
+function logout(){
+    localStorage.clear();
+    window.location.href="login.html";
+}
+</script>
+
+</body>
+</html>
