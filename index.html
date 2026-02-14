@@ -18,13 +18,13 @@ color:white;
 .container{
 display:flex;
 gap:60px;
-align-items:center;
 }
 
 canvas{
 image-rendering:pixelated;
+width:400px;
+height:500px;
 border:4px solid #a67c52;
-background:#00000020;
 }
 
 .panel{
@@ -49,11 +49,25 @@ border:none;
 
 <div class="container">
 
-<canvas id="bearCanvas"></canvas>
+<canvas id="bearCanvas" width="256" height="320"></canvas>
 
 <div class="panel">
 <label>Fur Color</label>
 <input type="color" id="furColor" value="#8b5a2b">
+
+<label>Hat</label>
+<select id="hatSelect">
+<option value="none">None</option>
+<option value="cap">Cap</option>
+<option value="crown">Crown</option>
+</select>
+
+<label>Glasses</label>
+<select id="glassesSelect">
+<option value="none">None</option>
+<option value="round">Round</option>
+<option value="square">Square</option>
+</select>
 
 <button id="saveBtn">SAVE</button>
 </div>
@@ -66,10 +80,25 @@ const canvas=document.getElementById("bearCanvas");
 const ctx=canvas.getContext("2d");
 
 const baseImage=new Image();
-baseImage.src="./og.bear.png";   // IMPORTANT
+const hatImages={
+cap:new Image(),
+crown:new Image()
+};
+const glassesImages={
+round:new Image(),
+square:new Image()
+};
+
+baseImage.src="og.bear.png";
+hatImages.cap.src="hat-cap.png";
+hatImages.crown.src="hat-crown.png";
+glassesImages.round.src="glasses-round.png";
+glassesImages.square.src="glasses-square.png";
 
 const state={
-fur:"#8b5a2b"
+fur:"#8b5a2b",
+hat:"none",
+glasses:"none"
 };
 
 function hexToRgb(hex){
@@ -91,41 +120,41 @@ const newColor=hexToRgb(state.fur);
 
 for(let i=0;i<data.length;i+=4){
 
-// detect original brown range
-if(data[i] > 90 && data[i] < 170 &&
-   data[i+1] > 40 && data[i+1] < 120 &&
-   data[i+2] < 100){
-
-data[i] = newColor.r;
-data[i+1] = newColor.g;
-data[i+2] = newColor.b;
-
+// detect brown fur tone range
+if(data[i]>100 && data[i+1]<120 && data[i+2]<100){
+data[i]=newColor.r;
+data[i+1]=newColor.g;
+data[i+2]=newColor.b;
 }
 
 }
 
 ctx.putImageData(imageData,0,0);
+
+if(state.hat!=="none"){
+ctx.drawImage(hatImages[state.hat],0,0);
 }
 
-baseImage.onload=function(){
+if(state.glasses!=="none"){
+ctx.drawImage(glassesImages[state.glasses],0,0);
+}
 
-// set canvas size dynamically to image
-canvas.width=baseImage.width;
-canvas.height=baseImage.height;
+}
 
-// upscale display (pixel perfect)
-canvas.style.width=baseImage.width*2+"px";
-canvas.style.height=baseImage.height*2+"px";
-
-recolorFur();
-};
-
-baseImage.onerror=function(){
-alert("og.bear.png NOT FOUND. Put it in same folder as index.html");
-};
+baseImage.onload=()=>recolorFur();
 
 document.getElementById("furColor").addEventListener("input",e=>{
 state.fur=e.target.value;
+recolorFur();
+});
+
+document.getElementById("hatSelect").addEventListener("change",e=>{
+state.hat=e.target.value;
+recolorFur();
+});
+
+document.getElementById("glassesSelect").addEventListener("change",e=>{
+state.glasses=e.target.value;
 recolorFur();
 });
 
