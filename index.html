@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lootify | Avatar Setup</title>
+<title>Lootify | System Access</title>
 <link rel="icon" href="rr.png">
 <style>
-html, body { margin:0; padding:0; height:100%; overflow:hidden; cursor:none; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+html, body { margin:0; padding:0; height:100%; overflow:hidden; cursor:none; font-family: monospace; }
 body {
   background:
     radial-gradient(circle at 25% 25%, #a67c52 0%, transparent 50%),
@@ -23,238 +23,35 @@ body {
 
 #particles { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
-#onboardingScreen { display:flex; justify-content:center; align-items:center; height:100%; }
-.system { width:90%; max-width:800px; transform:translateY(30px); }
-
-.onboarding-container {
-  display: none;
-  animation: fadeIn 0.5s ease;
-}
-.onboarding-container.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+#loginScreen { display:flex; justify-content:center; align-items:center; height:100%; }
+.system { width:90%; max-width:620px; transform:translateY(60px); }
 .terminal {
-  background:rgba(0,0,0,.75);
-  border-left:4px solid #a67c52;
-  padding:30px;
-  position:relative;
-  border-radius: 4px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  margin-top:25px;background:rgba(0,0,0,.65);
+  border-left:4px solid #a67c52;padding:22px;position:relative;
 }
-
-.terminal span { color:#e6c79c; display:block; margin:12px 0 6px; font-size: 15px; }
+.terminal span { color:#e6c79c; display:block; margin:8px 0; }
 
 .terminal input {
-  width:100%; margin:8px 0; padding:14px;
-  background:#2b1506; color:#f3d7b0; border:none; border-bottom:2px solid #5a2d15;
-  font-size: 16px;
-  transition: all 0.3s ease;
+  width:95%; margin:8px 0; padding:12px;cursor: none;
+  background:#2b1506; color:#f3d7b0; border:none; border-bottom:1px solid #5a2d15;
 }
-.terminal input:focus {
-  outline: none;
-  border-bottom-color: #a67c52;
-  background: #3d1f0a;
-}
-
 .terminal button {
-  padding:14px 24px;
-  background:#3d1f0a; color:#f3d7b0; border:1px solid #a67c52;
-  font-size: 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin: 8px 5px;
+  width:100%; margin:10px 0; padding:12px;
+  background:#3d1f0a; color:#f3d7b0; border:1px solid #a67c52;cursor: none;
 }
-.terminal button:hover { 
-  box-shadow:0 0 20px rgba(166,124,82,0.6);
-  transform: translateY(-2px);
-}
-.terminal button.primary {
-  background: #a67c52;
-  color: #2b1506;
-  font-weight: 600;
-}
+.terminal button:hover { box-shadow:0 0 20px rgba(166,124,82,0.6); }
 
-/* ===== STEP 1: NAME ENTRY ===== */
-.step-indicator {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 30px;
+.bear-login-wrapper {
+  position:absolute; bottom:98%; left:15%; transform:translateX(-50%);
+  width:159px; pointer-events:none;
 }
-.step {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: rgba(90, 45, 21, 0.5);
-  color: #e6c79c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-.step.active {
-  background: #a67c52;
-  color: #2b1506;
-  transform: scale(1.1);
-}
-.step.completed {
-  background: #8c6239;
-}
-
-.step-title {
-  text-align: center;
-  color: #f3d7b0;
-  font-size: 24px;
-  margin-bottom: 10px;
-  font-weight: 300;
-}
-.step-subtitle {
-  text-align: center;
-  color: #e6c79c;
-  margin-bottom: 30px;
-  opacity: 0.8;
-}
-
-.name-input-container {
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-/* ===== STEP 2: BEAR CUSTOMIZATION ===== */
-.customization-container {
-  display: flex;
-  gap: 30px;
-  margin-top: 20px;
-}
-
-.bear-display {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.bear-preview-wrapper {
-  width: 200px;
-  height: 200px;
-  background: rgba(43, 21, 6, 0.5);
-  border: 2px solid #5a2d15;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
-}
-
-#bearPreview {
-  width: 150px;
-  height: 150px;
-  image-rendering: pixelated;
-  position: relative;
-  z-index: 2;
-}
-
-.customization-options {
-  flex: 1;
-  background: rgba(43, 21, 6, 0.5);
-  border: 1px solid #5a2d15;
-  border-radius: 8px;
-  padding: 20px;
-}
-
-.option-category {
-  margin-bottom: 20px;
-}
-.option-category h4 {
-  color: #e6c79c;
-  margin: 0 0 12px 0;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.option-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.option-item {
-  background: rgba(61, 31, 10, 0.8);
-  border: 2px solid #5a2d15;
-  border-radius: 6px;
-  padding: 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #f3d7b0;
-  font-size: 14px;
-}
-.option-item:hover {
-  border-color: #a67c52;
-  transform: translateY(-2px);
-}
-.option-item.selected {
-  border-color: #a67c52;
-  background: rgba(166, 124, 82, 0.3);
-  box-shadow: 0 0 10px rgba(166, 124, 82, 0.3);
-}
-
-/* ===== STEP 3: LOGIN ===== */
-.login-step-container {
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.custom-bear-display {
-  text-align: center;
-  margin-bottom: 30px;
-}
-#finalBear {
-  width: 120px;
-  height: 120px;
-  image-rendering: pixelated;
-  margin-bottom: 10px;
-}
-.bear-name-display {
-  color: #e6c79c;
-  font-size: 18px;
-  margin-top: 10px;
-}
-
-.login-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-.login-actions button {
-  flex: 1;
-}
-
-/* Pupil animation (for Step 3 bear) */
+.bear-login { width:100%; image-rendering:pixelated; }
 .pupil {
   position:absolute; width:14px; height:14px;
   background:linear-gradient(#000 0 0) center/90% 8px no-repeat,
              linear-gradient(#000 0 0) center/7px 90% no-repeat;
   transform:translate(-50%,-50%); pointer-events:none; transition: transform 0.15s;
   transform-origin: center center;
-}
-
-/* Navigation */
-.navigation {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 30px;
 }
 </style>
 </head>
@@ -263,131 +60,25 @@ body {
 <div class="cursor"></div>
 <canvas id="particles"></canvas>
 
-<div id="onboardingScreen">
+<div id="loginScreen">
   <div class="system">
-    <!-- STEP INDICATOR -->
-    <div class="step-indicator">
-      <div class="step active" id="step1">1</div>
-      <div class="step" id="step2">2</div>
-      <div class="step" id="step3">3</div>
-    </div>
-    
-    <!-- TERMINAL CONTAINER -->
     <div class="terminal">
-    
-      <!-- STEP 1: NAME ENTRY -->
-      <div class="onboarding-container active" id="step1Container">
-        <div class="step-title">Welcome to Lootify</div>
-        <div class="step-subtitle">Let's personalize your experience</div>
-        
-        <div class="name-input-container">
-          <span>Enter your display name:</span>
-          <input type="text" id="userName" placeholder="e.g., TreasureHunter_42" maxlength="20">
-          <span style="font-size: 13px; opacity: 0.7; margin-top: 5px;">
-            This name will appear with your bear avatar
-          </span>
-          
-          <div style="text-align: center; margin-top: 30px;">
-            <button class="primary" onclick="nextToStep2()">CONTINUE →</button>
-          </div>
-        </div>
+      <div class="bear-login-wrapper">
+        <img src="bearee.png" class="bear-login" id="bear">
+        <div class="pupil" id="leftPupil"></div>
+        <div class="pupil" id="rightPupil"></div>
       </div>
-      
-      <!-- STEP 2: BEAR CUSTOMIZATION -->
-      <div class="onboarding-container" id="step2Container">
-        <div class="step-title">Customize Your Bear</div>
-        <div class="step-subtitle">Make it uniquely yours</div>
-        
-        <div class="customization-container">
-          <!-- LEFT: BEAR PREVIEW -->
-          <div class="bear-display">
-            <div class="bear-preview-wrapper">
-              <img src="bearee.png" class="bear-login" id="bearPreview">
-              <!-- Accessories will be positioned here with JS -->
-            </div>
-            <div id="previewName" style="color: #e6c79c; font-size: 18px;">Adventurer</div>
-          </div>
-          
-          <!-- RIGHT: CUSTOMIZATION OPTIONS -->
-          <div class="customization-options">
-            <div class="option-category">
-              <h4>HATS</h4>
-              <div class="option-grid">
-                <div class="option-item" onclick="selectHat('none')">None</div>
-                <div class="option-item" onclick="selectHat('cowboy')">🤠 Cowboy</div>
-                <div class="option-item" onclick="selectHat('crown')">👑 Crown</div>
-                <div class="option-item" onclick="selectHat('beanie')">🧢 Beanie</div>
-                <div class="option-item" onclick="selectHat('explorer')">🎩 Explorer</div>
-                <div class="option-item" onclick="selectHat('pirate')">🏴‍☠️ Pirate</div>
-              </div>
-            </div>
-            
-            <div class="option-category">
-              <h4>ACCESSORIES</h4>
-              <div class="option-grid">
-                <div class="option-item" onclick="selectAccessory('none')">None</div>
-                <div class="option-item" onclick="selectAccessory('scarf')">🧣 Scarf</div>
-                <div class="option-item" onclick="selectAccessory('monocle')">👁️ Monocle</div>
-                <div class="option-item" onclick="selectAccessory('backpack')">🎒 Backpack</div>
-                <div class="option-item" onclick="selectAccessory('sword')">⚔️ Sword</div>
-                <div class="option-item" onclick="selectAccessory('lantern')">🏮 Lantern</div>
-              </div>
-            </div>
-            
-            <div class="option-category">
-              <h4>COLOR</h4>
-              <div class="option-grid">
-                <div class="option-item" onclick="selectColor('default')" style="background: #a67c52;">Default</div>
-                <div class="option-item" onclick="selectColor('dark')" style="background: #5a2d15;">Dark</div>
-                <div class="option-item" onclick="selectColor('golden')" style="background: #d4a017;">Golden</div>
-                <div class="option-item" onclick="selectColor('white')" style="background: #e6d5b8; color: #2b1506;">White</div>
-                <div class="option-item" onclick="selectColor('grey')" style="background: #8a7f72;">Grey</div>
-                <div class="option-item" onclick="selectColor('reddish')" style="background: #b5651d;">Reddish</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="navigation">
-          <button onclick="backToStep1()">← BACK</button>
-          <button class="primary" onclick="nextToStep3()">SAVE & CONTINUE →</button>
-        </div>
-      </div>
-      
-      <!-- STEP 3: LOGIN -->
-      <div class="onboarding-container" id="step3Container">
-        <div class="step-title">Complete Your Setup</div>
-        <div class="step-subtitle">Your bear is ready! Now let's secure your account</div>
-        
-        <div class="login-step-container">
-          <div class="custom-bear-display">
-            <div style="position: relative; display: inline-block;">
-              <img src="bearee.png" id="finalBear">
-              <!-- Accessories for final bear will be added here -->
-            </div>
-            <div class="bear-name-display" id="finalName"></div>
-          </div>
-          
-          <span>&gt; EMAIL:</span>
-          <input id="email" type="email" placeholder="your.email@example.com">
-          <span>&gt; PASSWORD:</span>
-          <input id="pass" type="password" placeholder="••••••••">
-          
-          <div class="login-actions">
-            <button onclick="googleLogin()">GOOGLE LOGIN</button>
-            <button class="primary" onclick="login()">UNLOCK SYSTEM</button>
-          </div>
-          
-          <a href="sign up.html" style="display:block;margin-top:20px;color:#e6c79c;text-align:center;cursor:none;text-decoration:none;">
-            Don't have an account? Sign up here
-          </a>
-          
-          <div class="navigation" style="margin-top: 30px;">
-            <button onclick="backToStep2()">← EDIT BEAR</button>
-          </div>
-        </div>
-      </div>
-      
+
+      <span>&gt; EMAIL:</span>
+      <input id="email" type="email">
+      <span>&gt; PASSWORD:</span>
+      <input id="pass" type="password">
+
+      <button onclick="login()">UNLOCK SYSTEM</button>
+      <button onclick="googleLogin()">GOOGLE LOGIN</button>
+      <a href="sign up.html" style="display:block;margin-top:12px;color:#e6c79c;text-align:center;cursor:none">
+        you don’t have an account? sign up
+      </a>
     </div>
   </div>
 </div>
@@ -414,197 +105,22 @@ const provider = new GoogleAuthProvider();
 // ===== REDIRECT IF LOGGED IN =====
 onAuthStateChanged(auth, user => { if(user) location.href="Lootify1.html"; });
 
-// ===== ONBOARDING STATE =====
-let userData = {
-  name: '',
-  bearCustomization: {
-    hat: 'none',
-    accessory: 'none',
-    color: 'default'
-  }
-};
-
-// ===== STEP NAVIGATION =====
-function goToStep(stepNumber) {
-  // Update step indicator
-  document.querySelectorAll('.step').forEach((step, index) => {
-    step.classList.remove('active');
-    if(index + 1 === stepNumber) {
-      step.classList.add('active');
-    }
-    if(index + 1 < stepNumber) {
-      step.classList.add('completed');
-    } else {
-      step.classList.remove('completed');
-    }
-  });
-  
-  // Show/hide containers
-  document.querySelectorAll('.onboarding-container').forEach(container => {
-    container.classList.remove('active');
-  });
-  document.getElementById(`step${stepNumber}Container`).classList.add('active');
-}
-
-// Step 1 → Step 2
-function nextToStep2() {
-  const name = document.getElementById('userName').value.trim();
-  if(!name) {
-    alert('Please enter your name!');
-    return;
-  }
-  userData.name = name;
-  document.getElementById('previewName').textContent = name;
-  document.getElementById('finalName').textContent = name;
-  goToStep(2);
-}
-
-// Step 2 → Step 3
-function nextToStep3() {
-  // Apply final customization to step 3 bear
-  applyBearCustomization('finalBear', true);
-  goToStep(3);
-}
-
-// Back to Step 1
-function backToStep1() {
-  goToStep(1);
-}
-
-// Back to Step 2
-function backToStep2() {
-  goToStep(2);
-}
-
-// ===== BEAR CUSTOMIZATION FUNCTIONS =====
-function selectHat(hatType) {
-  userData.bearCustomization.hat = hatType;
-  applyBearCustomization('bearPreview', false);
-  updateSelection('hat', hatType);
-}
-
-function selectAccessory(accessoryType) {
-  userData.bearCustomization.accessory = accessoryType;
-  applyBearCustomization('bearPreview', false);
-  updateSelection('accessory', accessoryType);
-}
-
-function selectColor(colorType) {
-  userData.bearCustomization.color = colorType;
-  applyBearCustomization('bearPreview', false);
-  updateSelection('color', colorType);
-}
-
-function updateSelection(category, value) {
-  // Remove selected class from all options in category
-  const categoryEl = document.querySelector(`[onclick*="${category}"]`).closest('.option-category');
-  categoryEl.querySelectorAll('.option-item').forEach(item => {
-    item.classList.remove('selected');
-  });
-  
-  // Add selected class to clicked option
-  event.target.classList.add('selected');
-}
-
-function applyBearCustomization(bearId, isFinal) {
-  const bear = document.getElementById(bearId);
-  const parent = bear.parentElement;
-  
-  // Remove existing accessories
-  const existingAccessories = parent.querySelectorAll('.accessory');
-  existingAccessories.forEach(acc => acc.remove());
-  
-  // Apply color filter
-  const colors = {
-    'default': '',
-    'dark': 'filter: brightness(0.7) saturate(0.8)',
-    'golden': 'filter: hue-rotate(-30deg) brightness(1.1)',
-    'white': 'filter: brightness(1.5) grayscale(0.3)',
-    'grey': 'filter: grayscale(0.7) brightness(1.1)',
-    'reddish': 'filter: hue-rotate(20deg) saturate(1.2)'
-  };
-  bear.style = colors[userData.bearCustomization.color];
-  
-  // Add hat
-  if(userData.bearCustomization.hat !== 'none') {
-    const hat = document.createElement('div');
-    hat.className = 'accessory';
-    hat.style.position = 'absolute';
-    hat.style.zIndex = '3';
-    hat.style.top = isFinal ? '5px' : '10px';
-    hat.style.left = '50%';
-    hat.style.transform = 'translateX(-50%)';
-    hat.style.fontSize = isFinal ? '30px' : '40px';
-    
-    const hatEmojis = {
-      'cowboy': '🤠',
-      'crown': '👑',
-      'beanie': '🧢',
-      'explorer': '🎩',
-      'pirate': '🏴‍☠️'
-    };
-    hat.textContent = hatEmojis[userData.bearCustomization.hat];
-    parent.appendChild(hat);
-  }
-  
-  // Add accessory
-  if(userData.bearCustomization.accessory !== 'none') {
-    const accessory = document.createElement('div');
-    accessory.className = 'accessory';
-    accessory.style.position = 'absolute';
-    accessory.style.zIndex = '3';
-    accessory.style.fontSize = isFinal ? '24px' : '30px';
-    
-    const accessoryPositions = {
-      'scarf': { top: '70%', left: '50%', transform: 'translateX(-50%)' },
-      'monocle': { top: '35%', left: '60%' },
-      'backpack': { top: '50%', left: '15%' },
-      'sword': { top: '70%', left: '20%' },
-      'lantern': { top: '70%', left: '80%' }
-    };
-    
-    const accessoryEmojis = {
-      'scarf': '🧣',
-      'monocle': '👁️',
-      'backpack': '🎒',
-      'sword': '⚔️',
-      'lantern': '🏮'
-    };
-    
-    accessory.textContent = accessoryEmojis[userData.bearCustomization.accessory];
-    Object.assign(accessory.style, accessoryPositions[userData.bearCustomization.accessory]);
-    parent.appendChild(accessory);
-  }
-}
-
 // ===== LOGIN FUNCTIONS =====
 window.login = () => {
   const emailVal = document.getElementById('email').value;
   const passVal = document.getElementById('pass').value;
-  
   signInWithEmailAndPassword(auth, emailVal, passVal)
     .then(async cred => {
-      // Save user data with customization
-      await setDoc(doc(db, "users", cred.user.uid), { 
-        email: cred.user.email,
-        displayName: userData.name,
-        bearCustomization: userData.bearCustomization,
-        lastLogin: new Date()
-      });
-      location.href = "Lootify1.html";
+      await setDoc(doc(db, "users", cred.user.uid), { email:cred.user.email, lastLogin:new Date() });
+      location.href="Lootify1.html";
     }).catch(err => alert(err.message));
 };
 
 window.googleLogin = () => {
   signInWithPopup(auth, provider)
     .then(async cred => {
-      await setDoc(doc(db, "users", cred.user.uid), { 
-        email: cred.user.email,
-        displayName: userData.name,
-        bearCustomization: userData.bearCustomization,
-        lastLogin: new Date()
-      });
-      location.href = "Lootify1.html";
+      await setDoc(doc(db,"users",cred.user.uid), { email:cred.user.email, lastLogin:new Date() });
+      location.href="Lootify1.html";
     }).catch(err => alert(err.message));
 };
 
@@ -614,10 +130,59 @@ document.addEventListener("mousemove", e => {
   cursor.style.left = e.clientX + "px";
   cursor.style.top = e.clientY + "px";
 });
-document.querySelectorAll("button,input,.option-item").forEach(el=>{
+document.querySelectorAll("button,input").forEach(el=>{
   el.addEventListener("mouseenter",()=>cursor.classList.add("active"));
   el.addEventListener("mouseleave",()=>cursor.classList.remove("active"));
 });
+
+// ===== PUPILS =====
+const left = document.getElementById("leftPupil");
+const right = document.getElementById("rightPupil");
+const bear = document.querySelector(".bear-login-wrapper");
+left.style.left="38%"; left.style.top="30%";
+right.style.left="77%"; right.style.top="30%";
+
+document.addEventListener("mousemove", e => {
+  const r = bear.getBoundingClientRect();
+  const dx = e.clientX - (r.left + r.width/2);
+  const dy = e.clientY - (r.top + r.height/2);
+  const a = Math.atan2(dy, dx);
+  const x = Math.cos(a)*8;
+  const y = Math.sin(a)*8;
+
+  left.dataset.tx = x; left.dataset.ty = y;
+  right.dataset.tx = x; right.dataset.ty = y;
+
+  left.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px) scaleY(${left.dataset.blink || 1})`;
+  right.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px) scaleY(${right.dataset.blink || 1})`;
+});
+
+
+// ===== CLEAN SYNCHRONIZED BLINK =====
+const allPupils = [left, right];
+
+function blink(){
+  // close eyes
+  allPupils.forEach(p=>{
+    p.dataset.blink = 0.1;
+    p.style.transform =
+      `translate(-50%,-50%) translate(${p.dataset.tx||0}px,${p.dataset.ty||0}px) scaleY(0.1)`;
+  });
+
+  // open eyes
+  setTimeout(()=>{
+    allPupils.forEach(p=>{
+      p.dataset.blink = 1;
+      p.style.transform =
+        `translate(-50%,-50%) translate(${p.dataset.tx||0}px,${p.dataset.ty||0}px) scaleY(1)`;
+    });
+  },120);
+
+  // next blink (natural delay)
+  setTimeout(blink, Math.random()*2500 + 2500);
+}
+
+blink();
 
 // ===== PARTICLES =====
 const canvas = document.getElementById("particles");
@@ -651,18 +216,9 @@ function draw(){
 }
 draw();
 
-// Initialize with default selections
-document.addEventListener('DOMContentLoaded', () => {
-  // Set default selections
-  document.querySelector('[onclick="selectHat(\'none\')"]').classList.add('selected');
-  document.querySelector('[onclick="selectAccessory(\'none\')"]').classList.add('selected');
-  document.querySelector('[onclick="selectColor(\'default\')"]').classList.add('selected');
-});
-
 </script>
 </body>
 </html>
-
 
 
 
