@@ -1,673 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEARBOUND · entry</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      cursor: none; /* custom cursor */
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lootify | System Access</title>
+<link rel="icon" href="rr.png">
+<style>
+html, body { margin:0; padding:0; height:100%; overflow:hidden; cursor:none; font-family: monospace; }
+body {
+  background:
+    radial-gradient(circle at 25% 25%, #a67c52 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, #8c6239 0%, transparent 50%),
+    linear-gradient(180deg,#a67c52 0%,#8c6239 50%,#5a2d15 100%);
+}
+.cursor {
+  position:fixed; width:6px; height:6px;
+  border:2px solid #f3d7b0; border-radius:50%;
+  pointer-events:none; transform:translate(-50%,-50%);
+  z-index:9999; transition: transform 0.05s ease-out;
+}
+.cursor.active { transform:translate(-50%,-50%) scale(2); background:#f3d7b0; }
 
-    body {
-      height: 100vh;
-      background: 
-        radial-gradient(circle at 25% 25%, #a67c52 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, #8c6239 0%, transparent 50%),
-        linear-gradient(180deg, #a67c52 0%, #8c6239 50%, #5a2d15 100%);
-      font-family: 'Segoe UI', system-ui, monospace;
-      color: #f3d7b0;
-      overflow: hidden;
-      position: relative;
-    }
+#particles { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
-    /* custom cursor */
-    .cursor {
-      position: fixed;
-      width: 8px; height: 8px;
-      background: #f3d7b0;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: width 0.1s, height 0.1s, background 0.1s;
-      mix-blend-mode: difference;
-    }
-    .cursor.active {
-      width: 24px; height: 24px;
-      background: #ffd966;
-      mix-blend-mode: screen;
-    }
+#loginScreen { display:flex; justify-content:center; align-items:center; height:100%; }
+.system { width:90%; max-width:620px; transform:translateY(60px); }
+.terminal {
+  margin-top:25px;background:rgba(0,0,0,.65);
+  border-left:4px solid #a67c52;padding:22px;position:relative;
+}
+.terminal span { color:#e6c79c; display:block; margin:8px 0; }
 
-    /* particles canvas */
-    #particles {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
+.terminal input {
+  width:95%; margin:8px 0; padding:12px;cursor: none;
+  background:#2b1506; color:#f3d7b0; border:none; border-bottom:1px solid #5a2d15;
+}
+.terminal button {
+  width:100%; margin:10px 0; padding:12px;
+  background:#3d1f0a; color:#f3d7b0; border:1px solid #a67c52;cursor: none;
+}
+.terminal button:hover { box-shadow:0 0 20px rgba(166,124,82,0.6); }
 
-    /* overlays */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(3px);
-      transition: opacity 0.4s;
-    }
-    .hidden { opacity: 0; pointer-events: none; }
-
-    /* card style */
-    .glass-card {
-      background: rgba(20, 10, 3, 0.7);
-      border-left: 4px solid #a67c52;
-      padding: 2.2rem 2.5rem;
-      width: 340px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-      border-radius: 8px;
-      backdrop-filter: blur(4px);
-      text-align: center;
-    }
-    .glass-card h2 {
-      font-weight: 300;
-      letter-spacing: 2px;
-      margin-bottom: 1.5rem;
-      color: #eccc9e;
-    }
-    .glass-card input {
-      width: 100%;
-      background: #2b1506;
-      border: none;
-      border-bottom: 1px solid #a67c52;
-      padding: 12px 8px;
-      margin: 12px 0;
-      color: #f3d7b0;
-      font-size: 1rem;
-      outline: none;
-    }
-    .glass-card button {
-      background: transparent;
-      border: 1px solid #a67c52;
-      color: #f3d7b0;
-      padding: 12px 20px;
-      margin-top: 20px;
-      width: 100%;
-      font-weight: bold;
-      letter-spacing: 1px;
-      transition: 0.2s;
-    }
-    .glass-card button:hover {
-      background: #a67c52;
-      color: #1f0e03;
-    }
-
-    /* invisible button (opening) */
-    #openingBtn {
-      background: transparent;
-      border: none;
-      color: #f3d7b0;
-      font-size: 2.5rem;
-      font-weight: 300;
-      letter-spacing: 8px;
-      text-shadow: 0 0 15px #a67c52;
-      padding: 20px 40px;
-      cursor: none;
-      transition: 0.3s;
-    }
-    #openingBtn:hover {
-      text-shadow: 0 0 30px #e6b17e;
-      transform: scale(1.05);
-    }
-
-    /* main interface (after name/age) */
-    #mainInterface {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 5;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.6s;
-    }
-    #mainInterface.visible {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .split-panel {
-      display: flex;
-      gap: 30px;
-      max-width: 1200px;
-      width: 90%;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(6px);
-      border-left: 4px solid #a67c52;
-      border-radius: 28px;
-      padding: 30px;
-    }
-
-    /* left: bear canvas */
-    .bear-stage {
-      flex: 1.2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.25);
-      border-radius: 24px;
-      padding: 20px;
-      position: relative;
-    }
-    #bearContainer {
-      width: 320px;
-      height: 320px;
-      position: relative;
-    }
-    svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 10px 10px #00000060);
-      display: block;
-    }
-    .nameTag {
-      margin-top: 12px;
-      font-size: 1.4rem;
-      font-weight: bold;
-      background: rgba(0,0,0,0.5);
-      padding: 6px 25px;
-      border-radius: 60px;
-      border-left: 3px solid #a67c52;
-      letter-spacing: 1px;
-    }
-
-    /* right: dynamic panel (login / customize) */
-    .right-panel {
-      flex: 0.9;
-      min-width: 300px;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(4px);
-      border-radius: 20px;
-      padding: 22px;
-      position: relative;
-      box-shadow: 0 8px 20px #00000055;
-    }
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    .panel-header span {
-      font-size: 1.2rem;
-      opacity: 0.8;
-    }
-    .toggle-btn {
-      background: none;
-      border: 1px solid #a67c52;
-      color: #f3d7b0;
-      padding: 8px 16px;
-      border-radius: 40px;
-      font-size: 0.8rem;
-      letter-spacing: 1px;
-      transition: 0.2s;
-    }
-    .toggle-btn:hover {
-      background: #a67c52;
-      color: #000;
-    }
-
-    /* login form (default visible) */
-    #loginPanel input {
-      width: 100%;
-      background: #2b1506;
-      border: none;
-      border-bottom: 1px solid #5a2d15;
-      padding: 12px 8px;
-      margin: 12px 0;
-      color: #f3d7b0;
-    }
-    #loginPanel button {
-      width: 100%;
-      background: #3d1f0a;
-      border: 1px solid #a67c52;
-      color: #f3d7b0;
-      padding: 12px;
-      margin: 8px 0;
-      font-weight: 600;
-    }
-    .google-btn {
-      background: #2b1506 !important;
-    }
-    .signup-link {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 0.9rem;
-    }
-    .signup-link a {
-      color: #e6b17e;
-      text-decoration: none;
-      border-bottom: 1px dotted;
-    }
-
-    /* customization panel (hidden by default) */
-    #customPanel {
-      display: none;
-    }
-    .custom-row {
-      margin: 16px 0;
-    }
-    .custom-row label {
-      display: block;
-      font-size: 0.8rem;
-      opacity: 0.8;
-      margin-bottom: 4px;
-    }
-    .custom-row input[type="color"] {
-      width: 100%;
-      height: 40px;
-      background: #3d1f0a;
-      border: 1px solid #a67c52;
-    }
-    .custom-row select {
-      width: 100%;
-      padding: 10px;
-      background: #3d1f0a;
-      color: #f3d7b0;
-      border: 1px solid #a67c52;
-    }
-    .row-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .row-buttons button {
-      flex: 1;
-      background: #3d1f0a;
-      border: 1px solid #a67c52;
-      color: #f3d7b0;
-      padding: 10px;
-      font-size: 0.75rem;
-    }
-    .save-reset {
-      display: flex;
-      gap: 12px;
-      margin-top: 30px;
-    }
-    .save-reset button {
-      flex: 1;
-      background: #2b1506;
-      border: 1px solid #a67c52;
-      color: #f3d7b0;
-      padding: 12px;
-    }
-
-    /* pupils inside svg */
-    .pupil {
-      transition: transform 0.1s ease;
-    }
-  </style>
+.bear-login-wrapper {
+  position:absolute; bottom:98%; left:15%; transform:translateX(-50%);
+  width:159px; pointer-events:none;
+}
+.bear-login { width:100%; image-rendering:pixelated; }
+.pupil {
+  position:absolute; width:14px; height:14px;
+  background:linear-gradient(#000 0 0) center/90% 8px no-repeat,
+             linear-gradient(#000 0 0) center/7px 90% no-repeat;
+  transform:translate(-50%,-50%); pointer-events:none; transition: transform 0.15s;
+  transform-origin: center center;
+}
+</style>
 </head>
 <body>
 
-<!-- custom cursor -->
-<div class="cursor" id="customCursor"></div>
-
-<!-- particles canvas -->
+<div class="cursor"></div>
 <canvas id="particles"></canvas>
 
-<!-- OPENING (invisible button) -->
-<div id="openingOverlay" class="overlay">
-  <button id="openingBtn">▶ ENTER</button>
-</div>
-
-<!-- NAME & AGE OVERLAY -->
-<div id="nameAgeOverlay" class="overlay hidden">
-  <div class="glass-card">
-    <h2>✧ ɪᴅᴇɴᴛɪꜰʏ ʏᴏᴜʀꜱᴇʟꜰ ✧</h2>
-    <input type="text" id="userName" placeholder="your name" autocomplete="off">
-    <input type="number" id="userAge" placeholder="your age" min="1" max="120">
-    <button id="continueToLogin">continue →</button>
-  </div>
-</div>
-
-<!-- MAIN INTERFACE (bear + login/custom) -->
-<div id="mainInterface">
-  <div class="split-panel">
-    <!-- left: bear SVG with pupils -->
-    <div class="bear-stage">
-      <div id="bearContainer">
-        <svg id="bearSVG" viewBox="0 0 200 200">
-          <!-- BODY -->
-          <ellipse id="body" cx="100" cy="120" rx="50" ry="60" fill="#8B5A2B" />
-          <!-- HEAD -->
-          <circle id="head" cx="100" cy="70" r="40" fill="#8B5A2B" />
-          <!-- EYE WHITES (to hold pupils) -->
-          <circle id="eyeLeftWhite" cx="85" cy="65" r="8" fill="white" />
-          <circle id="eyeRightWhite" cx="115" cy="65" r="8" fill="white" />
-          <!-- PUPILS (movable) -->
-          <circle class="pupil" id="pupilLeft" cx="85" cy="65" r="4" fill="black" />
-          <circle class="pupil" id="pupilRight" cx="115" cy="65" r="4" fill="black" />
-          <!-- SHIRT -->
-          <rect id="shirt" x="60" y="110" width="80" height="40" fill="#3d1f0a" />
-          <!-- HAT GROUP (dynamic) -->
-          <g id="hatLayer"></g>
-          <!-- GLASSES GROUP (dynamic) -->
-          <g id="glassesLayer"></g>
-        </svg>
-      </div>
-      <div class="nameTag" id="bearNameTag">✧ guest ✧</div>
-    </div>
-
-    <!-- right panel with toggle -->
-    <div class="right-panel">
-      <div class="panel-header">
-        <span id="panelTitle">🔓 LOGIN</span>
-        <button class="toggle-btn" id="togglePanelBtn">⚙️ CUSTOMIZE</button>
+<div id="loginScreen">
+  <div class="system">
+    <div class="terminal">
+      <div class="bear-login-wrapper">
+        <img src="bearee.png" class="bear-login" id="bear">
+        <div class="pupil" id="leftPupil"></div>
+        <div class="pupil" id="rightPupil"></div>
       </div>
 
-      <!-- LOGIN FORM (default) -->
-      <div id="loginPanel">
-        <input type="email" id="loginEmail" placeholder="email">
-        <input type="password" id="loginPass" placeholder="password">
-        <button id="loginBtn">UNLOCK SYSTEM</button>
-        <button class="google-btn" id="googleLoginBtn">🌐 GOOGLE LOGIN</button>
-        <div class="signup-link">
-          <a href="#">you don’t have an account? sign up</a>
-        </div>
-      </div>
+      <span>&gt; EMAIL:</span>
+      <input id="email" type="email">
+      <span>&gt; PASSWORD:</span>
+      <input id="pass" type="password">
 
-      <!-- CUSTOMIZATION PANEL (hidden initially) -->
-      <div id="customPanel">
-        <div class="custom-row">
-          <label>🐻 fur color</label>
-          <input type="color" id="furColor" value="#8B5A2B">
-        </div>
-        <div class="custom-row">
-          <label>👁️ eye color</label>
-          <input type="color" id="eyeColor" value="#000000">
-        </div>
-        <div class="custom-row">
-          <label>👕 shirt color</label>
-          <input type="color" id="shirtColor" value="#3d1f0a">
-        </div>
-        <div class="custom-row">
-          <label>🧢 hat</label>
-          <select id="hatSelect">
-            <option value="none">none</option>
-            <option value="cap">cap</option>
-            <option value="crown">crown</option>
-          </select>
-        </div>
-        <div class="custom-row">
-          <label>👓 glasses</label>
-          <select id="glassesSelect">
-            <option value="none">none</option>
-            <option value="round">round</option>
-            <option value="square">square</option>
-          </select>
-        </div>
-        <div class="custom-row">
-          <label>📐 body shape</label>
-          <select id="bodyShapeSelect">
-            <option value="normal">normal</option>
-            <option value="fat">fat</option>
-            <option value="skinny">skinny</option>
-          </select>
-        </div>
-        <div class="save-reset">
-          <button id="saveCustomBtn">💾 SAVE</button>
-          <button id="resetCustomBtn">↺ RESET</button>
-        </div>
-      </div>
+      <button onclick="login()">UNLOCK SYSTEM</button>
+      <button onclick="googleLogin()">GOOGLE LOGIN</button>
+      <a href="sign up.html" style="display:block;margin-top:12px;color:#e6c79c;text-align:center;cursor:none">
+        you don’t have an account? sign up
+      </a>
     </div>
   </div>
 </div>
 
-<script>
-  (function() {
-    // ----- CURSOR -----
-    const cursor = document.getElementById('customCursor');
-    document.addEventListener('mousemove', (e) => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
+<script type="module">
+// ===== FIREBASE =====
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC9CiSEsdIYIHcFhTkrwyCxlLUUxkmLiDY",
+  authDomain: "lootify-89bf6.firebaseapp.com",
+  projectId: "lootify-89bf6",
+  storageBucket: "lootify-89bf6.appspot.com",
+  messagingSenderId: "1075454919896",
+  appId: "1:1075454919896:web:3cada8ca62c612dd9a03ad"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+// ===== REDIRECT IF LOGGED IN =====
+onAuthStateChanged(auth, user => { if(user) location.href="Lootify1.html"; });
+
+// ===== LOGIN FUNCTIONS =====
+window.login = () => {
+  const emailVal = document.getElementById('email').value;
+  const passVal = document.getElementById('pass').value;
+  signInWithEmailAndPassword(auth, emailVal, passVal)
+    .then(async cred => {
+      await setDoc(doc(db, "users", cred.user.uid), { email:cred.user.email, lastLogin:new Date() });
+      location.href="Lootify1.html";
+    }).catch(err => alert(err.message));
+};
+
+window.googleLogin = () => {
+  signInWithPopup(auth, provider)
+    .then(async cred => {
+      await setDoc(doc(db,"users",cred.user.uid), { email:cred.user.email, lastLogin:new Date() });
+      location.href="Lootify1.html";
+    }).catch(err => alert(err.message));
+};
+
+// ===== CURSOR =====
+const cursor = document.querySelector(".cursor");
+document.addEventListener("mousemove", e => {
+  cursor.style.left = e.clientX + "px";
+  cursor.style.top = e.clientY + "px";
+});
+document.querySelectorAll("button,input").forEach(el=>{
+  el.addEventListener("mouseenter",()=>cursor.classList.add("active"));
+  el.addEventListener("mouseleave",()=>cursor.classList.remove("active"));
+});
+
+// ===== PUPILS =====
+const left = document.getElementById("leftPupil");
+const right = document.getElementById("rightPupil");
+const bear = document.querySelector(".bear-login-wrapper");
+left.style.left="38%"; left.style.top="30%";
+right.style.left="77%"; right.style.top="30%";
+
+document.addEventListener("mousemove", e => {
+  const r = bear.getBoundingClientRect();
+  const dx = e.clientX - (r.left + r.width/2);
+  const dy = e.clientY - (r.top + r.height/2);
+  const a = Math.atan2(dy, dx);
+  const x = Math.cos(a)*8;
+  const y = Math.sin(a)*8;
+
+  left.dataset.tx = x; left.dataset.ty = y;
+  right.dataset.tx = x; right.dataset.ty = y;
+
+  left.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px) scaleY(${left.dataset.blink || 1})`;
+  right.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px) scaleY(${right.dataset.blink || 1})`;
+});
+
+
+// ===== CLEAN SYNCHRONIZED BLINK =====
+const allPupils = [left, right];
+
+function blink(){
+  // close eyes
+  allPupils.forEach(p=>{
+    p.dataset.blink = 0.1;
+    p.style.transform =
+      `translate(-50%,-50%) translate(${p.dataset.tx||0}px,${p.dataset.ty||0}px) scaleY(0.1)`;
+  });
+
+  // open eyes
+  setTimeout(()=>{
+    allPupils.forEach(p=>{
+      p.dataset.blink = 1;
+      p.style.transform =
+        `translate(-50%,-50%) translate(${p.dataset.tx||0}px,${p.dataset.ty||0}px) scaleY(1)`;
     });
-    document.querySelectorAll('button, input, select, a').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('active'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('active'));
-    });
+  },120);
 
-    // ----- PARTICLES (from last code) -----
-    const canvas = document.getElementById('particles');
-    const ctx = canvas.getContext('2d');
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    let particles = [];
-    for (let i = 0; i < 110; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 2 + 1,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        color: `hsla(${Math.random() * 40 + 20}, 50%, 70%, 0.4)`
-      });
-    }
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if (p.x > canvas.width) p.x = 0; if (p.x < 0) p.x = canvas.width;
-        if (p.y > canvas.height) p.y = 0; if (p.y < 0) p.y = canvas.height;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-      });
-      requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
+  // next blink (natural delay)
+  setTimeout(blink, Math.random()*2500 + 2500);
+}
 
-    // ----- OVERLAYS FLOW -----
-    const opening = document.getElementById('openingOverlay');
-    const nameAgeOverlay = document.getElementById('nameAgeOverlay');
-    const mainInterface = document.getElementById('mainInterface');
-    const openingBtn = document.getElementById('openingBtn');
-    const continueBtn = document.getElementById('continueToLogin');
-    const userName = document.getElementById('userName');
-    const userAge = document.getElementById('userAge');
-    const bearNameTag = document.getElementById('bearNameTag');
+blink();
 
-    openingBtn.addEventListener('click', () => {
-      opening.classList.add('hidden');
-      nameAgeOverlay.classList.remove('hidden');
-    });
+// ===== PARTICLES =====
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+function resize(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
+window.addEventListener("resize",resize); resize();
 
-    continueBtn.addEventListener('click', () => {
-      const name = userName.value.trim() || 'guest';
-      const age = userAge.value || '?';
-      bearNameTag.innerText = `${name} · ${age}`;
-      nameAgeOverlay.classList.add('hidden');
-      mainInterface.classList.add('visible');
-    });
+let particles=[];
+for(let i=0;i<120;i++){
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*2+1,
+    vx: (Math.random()-0.5)/2,
+    vy: (Math.random()-0.5)/2,
+    color: `hsla(${Math.random()*40+20},35%,80%,0.35)`
+  });
+}
 
-    // ----- TOGGLE BETWEEN LOGIN & CUSTOM PANELS -----
-    const loginPanel = document.getElementById('loginPanel');
-    const customPanel = document.getElementById('customPanel');
-    const toggleBtn = document.getElementById('togglePanelBtn');
-    const panelTitle = document.getElementById('panelTitle');
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x>canvas.width) p.x=0; if(p.x<0) p.x=canvas.width;
+    if(p.y>canvas.height) p.y=0; if(p.y<0) p.y=canvas.height;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = p.color; ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+draw();
 
-    toggleBtn.addEventListener('click', () => {
-      if (loginPanel.style.display !== 'none') {
-        loginPanel.style.display = 'none';
-        customPanel.style.display = 'block';
-        panelTitle.innerText = '🎨 CUSTOMIZE';
-        toggleBtn.innerText = '🔐 LOGIN';
-      } else {
-        loginPanel.style.display = 'block';
-        customPanel.style.display = 'none';
-        panelTitle.innerText = '🔓 LOGIN';
-        toggleBtn.innerText = '⚙️ CUSTOMIZE';
-      }
-    });
-
-    // ----- SVG BEAR CUSTOMIZATION (similar to first snippet) + pupils -----
-    const bodyEl = document.getElementById('body');
-    const head = document.getElementById('head');
-    const shirt = document.getElementById('shirt');
-    const pupilL = document.getElementById('pupilLeft');
-    const pupilR = document.getElementById('pupilRight');
-    const hatLayer = document.getElementById('hatLayer');
-    const glassesLayer = document.getElementById('glassesLayer');
-
-    // state
-    const state = {
-      fur: '#8B5A2B',
-      eyes: '#000000',
-      shirt: '#3d1f0a',
-      hat: 'none',
-      glasses: 'none',
-      bodyShape: 'normal'
-    };
-
-    // input elements
-    const furInput = document.getElementById('furColor');
-    const eyeColorInput = document.getElementById('eyeColor');
-    const shirtInput = document.getElementById('shirtColor');
-    const hatSelect = document.getElementById('hatSelect');
-    const glassesSelect = document.getElementById('glassesSelect');
-    const bodyShapeSelect = document.getElementById('bodyShapeSelect');
-
-    function renderBear() {
-      bodyEl.setAttribute('fill', state.fur);
-      head.setAttribute('fill', state.fur);
-      shirt.setAttribute('fill', state.shirt);
-      pupilL.setAttribute('fill', state.eyes);
-      pupilR.setAttribute('fill', state.eyes);
-
-      // body shape
-      if (state.bodyShape === 'fat') {
-        bodyEl.setAttribute('rx', 65); bodyEl.setAttribute('ry', 75);
-      } else if (state.bodyShape === 'skinny') {
-        bodyEl.setAttribute('rx', 40); bodyEl.setAttribute('ry', 55);
-      } else {
-        bodyEl.setAttribute('rx', 50); bodyEl.setAttribute('ry', 60);
-      }
-
-      // hat
-      hatLayer.innerHTML = '';
-      if (state.hat === 'cap') {
-        hatLayer.innerHTML = `<rect x="65" y="25" width="70" height="20" fill="#111"/><rect x="80" y="45" width="40" height="8" fill="#111"/>`;
-      } else if (state.hat === 'crown') {
-        hatLayer.innerHTML = `<polygon points="70,40 85,20 100,40 115,20 130,40" fill="gold"/><rect x="70" y="40" width="60" height="10" fill="gold"/>`;
-      }
-
-      // glasses
-      glassesLayer.innerHTML = '';
-      if (state.glasses === 'round') {
-        glassesLayer.innerHTML = `<circle cx="85" cy="65" r="12" stroke="black" fill="none" stroke-width="2"/><circle cx="115" cy="65" r="12" stroke="black" fill="none" stroke-width="2"/><line x1="97" y1="65" x2="103" y2="65" stroke="black" stroke-width="2"/>`;
-      } else if (state.glasses === 'square') {
-        glassesLayer.innerHTML = `<rect x="72" y="53" width="26" height="24" stroke="black" fill="none" stroke-width="2"/><rect x="102" y="53" width="26" height="24" stroke="black" fill="none" stroke-width="2"/><line x1="98" y1="65" x2="102" y2="65" stroke="black" stroke-width="2"/>`;
-      }
-    }
-
-    furInput.addEventListener('input', (e) => { state.fur = e.target.value; renderBear(); });
-    eyeColorInput.addEventListener('input', (e) => { state.eyes = e.target.value; renderBear(); });
-    shirtInput.addEventListener('input', (e) => { state.shirt = e.target.value; renderBear(); });
-    hatSelect.addEventListener('change', (e) => { state.hat = e.target.value; renderBear(); });
-    glassesSelect.addEventListener('change', (e) => { state.glasses = e.target.value; renderBear(); });
-    bodyShapeSelect.addEventListener('change', (e) => { state.bodyShape = e.target.value; renderBear(); });
-
-    document.getElementById('saveCustomBtn').addEventListener('click', () => {
-      localStorage.setItem('bearState', JSON.stringify(state));
-      alert('customization saved locally');
-    });
-    document.getElementById('resetCustomBtn').addEventListener('click', () => {
-      localStorage.removeItem('bearState');
-      location.reload();
-    });
-
-    // load saved state
-    function loadSavedState() {
-      try {
-        const saved = JSON.parse(localStorage.getItem('bearState'));
-        if (saved) {
-          Object.assign(state, saved);
-          furInput.value = state.fur;
-          eyeColorInput.value = state.eyes;
-          shirtInput.value = state.shirt;
-          hatSelect.value = state.hat;
-          glassesSelect.value = state.glasses;
-          bodyShapeSelect.value = state.bodyShape;
-          renderBear();
-        }
-      } catch (e) {}
-    }
-    loadSavedState();
-    renderBear();
-
-    // ----- PUPILS FOLLOW MOUSE + BLINK (inspired by last code) -----
-    const leftPupil = pupilL;
-    const rightPupil = pupilR;
-    const svg = document.getElementById('bearSVG');
-    let mouseX = 0, mouseY = 0;
-
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      movePupils();
-    });
-
-    function movePupils() {
-      const svgRect = svg.getBoundingClientRect();
-      const centerX = svgRect.left + svgRect.width / 2;
-      const centerY = svgRect.top + svgRect.height / 2;
-      const dx = mouseX - centerX;
-      const dy = mouseY - centerY;
-      const angle = Math.atan2(dy, dx);
-      const distance = Math.min(8, Math.hypot(dx, dy) * 0.1);
-      const moveX = Math.cos(angle) * distance;
-      const moveY = Math.sin(angle) * distance;
-
-      leftPupil.setAttribute('transform', `translate(${moveX}, ${moveY})`);
-      rightPupil.setAttribute('transform', `translate(${moveX}, ${moveY})`);
-    }
-
-    // blink
-    function blink() {
-      leftPupil.setAttribute('ry', '1');
-      rightPupil.setAttribute('ry', '1');
-      setTimeout(() => {
-        leftPupil.setAttribute('ry', '4');
-        rightPupil.setAttribute('ry', '4');
-      }, 120);
-      setTimeout(blink, Math.random() * 2500 + 2500);
-    }
-    blink();
-
-    // ----- MOCK LOGIN (Firebase simulation, no actual backend) -----
-    document.getElementById('loginBtn').addEventListener('click', () => {
-      alert('🔓 demo: login would connect to Firebase. (email/password mock)');
-    });
-    document.getElementById('googleLoginBtn').addEventListener('click', () => {
-      alert('🌐 Google login demo — redirect not configured');
-    });
-
-  })();
 </script>
 </body>
 </html>
+
+
+
 
