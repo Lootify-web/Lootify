@@ -46,12 +46,14 @@ body {
   width:159px; pointer-events:none;
 }
 .bear-login { width:100%; image-rendering:pixelated; }
+
 .pupil {
   position:absolute; width:14px; height:14px;
   background:linear-gradient(#000 0 0) center/90% 8px no-repeat,
              linear-gradient(#000 0 0) center/7px 90% no-repeat;
-  transform:translate(-50%,-50%); pointer-events:none; transition: transform 0.15s;
-  transform-origin: center center;
+  transform:translate(-50%,-50%);
+  pointer-events:none; transition: transform 0.15s;
+  transform-origin:center center;
 }
 </style>
 </head>
@@ -64,7 +66,8 @@ body {
   <div class="system">
     <div class="terminal">
       <div class="bear-login-wrapper">
-        <img src="bearee.png" class="bear-login" id="bear">
+        <!-- 🔥 بدل image حطينا canvas -->
+        <canvas id="bearCanvas" class="bear-login" width="159" height="200"></canvas>
         <div class="pupil" id="leftPupil"></div>
         <div class="pupil" id="rightPupil"></div>
       </div>
@@ -84,10 +87,10 @@ body {
 </div>
 
 <script type="module">
-// ===== FIREBASE =====
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC9CiSEsdIYIHcFhTkrwyCxlLUUxkmLiDY",
@@ -97,38 +100,73 @@ const firebaseConfig = {
   messagingSenderId: "1075454919896",
   appId: "1:1075454919896:web:3cada8ca62c612dd9a03ad"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// ===== REDIRECT IF LOGGED IN =====
-onAuthStateChanged(auth, user => { if(user) location.href="Lootify1.html"; });
+const canvasBear = document.getElementById("bearCanvas");
+const ctxBear = canvasBear.getContext("2d");
+const baseImage = new Image();
+baseImage.src = "bearee.png";
 
-// ===== LOGIN FUNCTIONS =====
+function drawBear(tint=null){
+  ctxBear.clearRect(0,0,canvasBear.width,canvasBear.height);
+  ctxBear.drawImage(baseImage,0,0,canvasBear.width,canvasBear.height);
+
+  if(tint){
+    ctxBear.globalCompositeOperation="source-atop";
+    ctxBear.fillStyle=tint;
+    ctxBear.fillRect(0,0,canvasBear.width,canvasBear.height);
+    ctxBear.globalCompositeOperation="source-over";
+  }
+}
+
+baseImage.onload=()=> drawBear();
+
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    const snap = await getDoc(doc(db,"users",user.uid));
+    if(snap.exists() && snap.data().bear){
+      drawBear(snap.data().bear.fur || null);
+    }else{
+      drawBear();
+    }
+  }else{
+    drawBear();
+  }
+});
+
 window.login = () => {
   const emailVal = document.getElementById('email').value;
   const passVal = document.getElementById('pass').value;
   signInWithEmailAndPassword(auth, emailVal, passVal)
     .then(async cred => {
-      await setDoc(doc(db, "users", cred.user.uid), { email:cred.user.email, lastLogin:new Date() });
+      await setDoc(doc(db,"users",cred.user.uid),{
+        email:cred.user.email,
+        lastLogin:new Date()
+      },{merge:true});
       location.href="Lootify1.html";
-    }).catch(err => alert(err.message));
+    }).catch(err=>alert(err.message));
 };
 
 window.googleLogin = () => {
   signInWithPopup(auth, provider)
-    .then(async cred => {
-      await setDoc(doc(db,"users",cred.user.uid), { email:cred.user.email, lastLogin:new Date() });
+    .then(async cred=>{
+      await setDoc(doc(db,"users",cred.user.uid),{
+        email:cred.user.email,
+        lastLogin:new Date()
+      },{merge:true});
       location.href="Lootify1.html";
-    }).catch(err => alert(err.message));
+    }).catch(err=>alert(err.message));
 };
 
 // ===== CURSOR =====
 const cursor = document.querySelector(".cursor");
-document.addEventListener("mousemove", e => {
-  cursor.style.left = e.clientX + "px";
-  cursor.style.top = e.clientY + "px";
+document.addEventListener("mousemove", e=>{
+  cursor.style.left=e.clientX+"px";
+  cursor.style.top=e.clientY+"px";
 });
 document.querySelectorAll("button,input").forEach(el=>{
   el.addEventListener("mouseenter",()=>cursor.classList.add("active"));
@@ -136,69 +174,38 @@ document.querySelectorAll("button,input").forEach(el=>{
 });
 
 // ===== PUPILS =====
-const left = document.getElementById("leftPupil");
-const right = document.getElementById("rightPupil");
-const bear = document.querySelector(".bear-login-wrapper");
+const left=document.getElementById("leftPupil");
+const right=document.getElementById("rightPupil");
+const bearWrap=document.querySelector(".bear-login-wrapper");
 left.style.left="38%"; left.style.top="30%";
 right.style.left="77%"; right.style.top="30%";
 
-document.addEventListener("mousemove", e => {
-  const r = bear.getBoundingClientRect();
-  const dx = e.clientX - (r.left + r.width/2);
-  const dy = e.clientY - (r.top + r.height/2);
-  const a = Math.atan2(dy, dx);
-  const x = Math.cos(a)*8;
-  const y = Math.sin(a)*8;
-
-  left.dataset.tx = x; left.dataset.ty = y;
-  right.dataset.tx = x; right.dataset.ty = y;
-
-  left.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px) scaleY(${left.dataset.blink || 1})`;
-  right.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px) scaleY(${right.dataset.blink || 1})`;
+document.addEventListener("mousemove", e=>{
+  const r=bearWrap.getBoundingClientRect();
+  const dx=e.clientX-(r.left+r.width/2);
+  const dy=e.clientY-(r.top+r.height/2);
+  const a=Math.atan2(dy,dx);
+  const x=Math.cos(a)*8;
+  const y=Math.sin(a)*8;
+  left.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;
+  right.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;
 });
 
-
-// ===== CLEAN SYNCHRONIZED BLINK =====
-const allPupils = [left, right];
-
-function blink(){
-  // close eyes
-  allPupils.forEach(p=>{
-    p.dataset.blink = 0.1;
-    p.style.transform =
-      `translate(-50%,-50%) translate(${p.dataset.tx||0}px,${p.dataset.ty||0}px) scaleY(0.1)`;
-  });
-
-  // open eyes
-  setTimeout(()=>{
-    allPupils.forEach(p=>{
-      p.dataset.blink = 1;
-      p.style.transform =
-        `translate(-50%,-50%) translate(${p.dataset.tx||0}px,${p.dataset.ty||0}px) scaleY(1)`;
-    });
-  },120);
-
-  // next blink (natural delay)
-  setTimeout(blink, Math.random()*2500 + 2500);
-}
-
-blink();
-
 // ===== PARTICLES =====
-const canvas = document.getElementById("particles");
-const ctx = canvas.getContext("2d");
-function resize(){canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+function resize(){canvas.width=innerWidth; canvas.height=innerHeight;}
 window.addEventListener("resize",resize); resize();
 
 let particles=[];
 for(let i=0;i<120;i++){
   particles.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    r: Math.random()*2+1,
-    vx: (Math.random()-0.5)/2,
-    vy: (Math.random()-0.5)/2,
-    color: `hsla(${Math.random()*40+20},35%,80%,0.35)`
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*2+1,
+    vx:(Math.random()-0.5)/2,
+    vy:(Math.random()-0.5)/2,
+    color:`hsla(${Math.random()*40+20},35%,80%,0.35)`
   });
 }
 
@@ -210,7 +217,8 @@ function draw(){
     if(p.y>canvas.height) p.y=0; if(p.y<0) p.y=canvas.height;
     ctx.beginPath();
     ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle = p.color; ctx.fill();
+    ctx.fillStyle=p.color;
+    ctx.fill();
   });
   requestAnimationFrame(draw);
 }
@@ -219,7 +227,3 @@ draw();
 </script>
 </body>
 </html>
-
-
-
-
