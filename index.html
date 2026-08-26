@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,58 +6,129 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lootify | System Access</title>
 <link rel="icon" href="rr.png">
+
 <style>
-html, body { margin:0; padding:0; height:100%; overflow:hidden; cursor:none; font-family: monospace; }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  cursor: none;
+  font-family: monospace;
+}
+
 body {
   background:
     radial-gradient(circle at 25% 25%, #a67c52 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, #8c6239 0%, transparent 50%),
-    linear-gradient(180deg,#a67c52 0%,#8c6239 50%,#5a2d15 100%);
+    linear-gradient(180deg, #a67c52 0%, #8c6239 50%, #5a2d15 100%);
 }
+
 .cursor {
-  position:fixed; width:6px; height:6px;
-  border:2px solid #f3d7b0; border-radius:50%;
-  pointer-events:none; transform:translate(-50%,-50%);
-  z-index:9999; transition: transform 0.05s ease-out;
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border: 2px solid #f3d7b0;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  transition: transform 0.05s ease-out;
 }
-.cursor.active { transform:translate(-50%,-50%) scale(2); background:#f3d7b0; }
 
-#particles { position:fixed; inset:0; z-index:0; pointer-events:none; }
+.cursor.active {
+  transform: translate(-50%, -50%) scale(2);
+  background: #f3d7b0;
+}
 
-#loginScreen { display:flex; justify-content:center; align-items:center; height:100%; }
-.system { width:90%; max-width:620px; transform:translateY(60px); }
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#loginScreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.system {
+  width: 90%;
+  max-width: 620px;
+  transform: translateY(60px);
+}
+
 .terminal {
-  margin-top:25px;background:rgba(0,0,0,.65);
-  border-left:4px solid #a67c52;padding:22px;position:relative;
+  margin-top: 25px;
+  background: rgba(0, 0, 0, .65);
+  border-left: 4px solid #a67c52;
+  padding: 22px;
+  position: relative;
 }
-.terminal span { color:#e6c79c; display:block; margin:8px 0; }
+
+.terminal span {
+  color: #e6c79c;
+  display: block;
+  margin: 8px 0;
+}
 
 .terminal input {
-  width:95%; margin:8px 0; padding:12px;cursor: none;
-  background:#2b1506; color:#f3d7b0; border:none; border-bottom:1px solid #5a2d15;
+  width: 95%;
+  margin: 8px 0;
+  padding: 12px;
+  cursor: none;
+  background: #2b1506;
+  color: #f3d7b0;
+  border: none;
+  border-bottom: 1px solid #5a2d15;
 }
+
 .terminal button {
-  width:100%; margin:10px 0; padding:12px;
-  background:#3d1f0a; color:#f3d7b0; border:1px solid #a67c52;cursor: none;
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  background: #3d1f0a;
+  color: #f3d7b0;
+  border: 1px solid #a67c52;
+  cursor: none;
 }
-.terminal button:hover { box-shadow:0 0 20px rgba(166,124,82,0.6); }
+
+.terminal button:hover {
+  box-shadow: 0 0 20px rgba(166, 124, 82, 0.6);
+}
 
 .bear-login-wrapper {
-  position:absolute; bottom:98%; left:15%; transform:translateX(-50%);
-  width:159px; pointer-events:none;
+  position: absolute;
+  bottom: 98%;
+  left: 15%;
+  transform: translateX(-50%);
+  width: 159px;
+  pointer-events: none;
 }
-.bear-login { width:100%; image-rendering:pixelated; }
+
+.bear-login {
+  width: 100%;
+  image-rendering: pixelated;
+}
 
 .pupil {
-  position:absolute; width:14px; height:14px;
-  background:linear-gradient(#000 0 0) center/90% 8px no-repeat,
-             linear-gradient(#000 0 0) center/7px 90% no-repeat;
-  transform:translate(-50%,-50%);
-  pointer-events:none; transition: transform 0.15s;
-  transform-origin:center center;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background:
+    linear-gradient(#000 0 0) center/90% 8px no-repeat,
+    linear-gradient(#000 0 0) center/7px 90% no-repeat;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: transform 0.15s;
+  transform-origin: center center;
 }
 </style>
 </head>
+
 <body>
 
 <div class="cursor"></div>
@@ -64,33 +136,68 @@ body {
 
 <div id="loginScreen">
   <div class="system">
+
     <div class="terminal">
+
       <div class="bear-login-wrapper">
-        <!-- 🔥 بدل image حطينا canvas -->
-        <canvas id="bearCanvas" class="bear-login" width="159" height="200"></canvas>
+
+        <canvas
+          id="bearCanvas"
+          class="bear-login"
+          width="159"
+          height="200">
+        </canvas>
+
         <div class="pupil" id="leftPupil"></div>
         <div class="pupil" id="rightPupil"></div>
+
       </div>
 
       <span>&gt; EMAIL:</span>
       <input id="email" type="email">
+
       <span>&gt; PASSWORD:</span>
       <input id="pass" type="password">
 
       <button onclick="login()">UNLOCK SYSTEM</button>
+
       <button onclick="googleLogin()">GOOGLE LOGIN</button>
-      <a href="sign up.html" style="display:block;margin-top:12px;color:#e6c79c;text-align:center;cursor:none">
+
+      <a
+        href="sign up.html"
+        style="display:block;margin-top:12px;color:#e6c79c;text-align:center;cursor:none">
         you don’t have an account? sign up
       </a>
+
     </div>
   </div>
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+
+/* =========================
+   FIREBASE
+========================= */
 
 const firebaseConfig = {
   apiKey: "AIzaSyC9CiSEsdIYIHcFhTkrwyCxlLUUxkmLiDY",
@@ -102,128 +209,461 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
 const db = getFirestore(app);
+
 const provider = new GoogleAuthProvider();
 
+
+/* =========================
+   BEAR
+========================= */
+
 const canvasBear = document.getElementById("bearCanvas");
+
 const ctxBear = canvasBear.getContext("2d");
+
 const baseImage = new Image();
+
 baseImage.src = "bearee.png";
 
-function drawBear(tint=null){
-  ctxBear.clearRect(0,0,canvasBear.width,canvasBear.height);
-  ctxBear.drawImage(baseImage,0,0,canvasBear.width,canvasBear.height);
 
-  if(tint){
-    ctxBear.globalCompositeOperation="source-atop";
-    ctxBear.fillStyle=tint;
-    ctxBear.fillRect(0,0,canvasBear.width,canvasBear.height);
-    ctxBear.globalCompositeOperation="source-over";
+function drawBear(tint = null) {
+
+  ctxBear.clearRect(
+    0,
+    0,
+    canvasBear.width,
+    canvasBear.height
+  );
+
+  ctxBear.drawImage(
+    baseImage,
+    0,
+    0,
+    canvasBear.width,
+    canvasBear.height
+  );
+
+  if (tint) {
+
+    ctxBear.globalCompositeOperation = "source-atop";
+
+    ctxBear.fillStyle = tint;
+
+    ctxBear.fillRect(
+      0,
+      0,
+      canvasBear.width,
+      canvasBear.height
+    );
+
+    ctxBear.globalCompositeOperation = "source-over";
   }
 }
 
-baseImage.onload=()=> drawBear();
 
-onAuthStateChanged(auth, async user=>{
-  if(user){
-    const snap = await getDoc(doc(db,"users",user.uid));
-    if(snap.exists() && snap.data().bear){
-      drawBear(snap.data().bear.fur || null);
-    }else{
+baseImage.onload = () => {
+  drawBear();
+};
+
+
+/* =========================
+   AUTH STATE
+========================= */
+
+onAuthStateChanged(auth, async user => {
+
+  if (!user) {
+
+    drawBear();
+
+    return;
+  }
+
+
+  /*
+    User is already authenticated.
+
+    Load their bear data first.
+  */
+
+  try {
+
+    const snap = await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+    if (
+      snap.exists() &&
+      snap.data().bear
+    ) {
+
+      drawBear(
+        snap.data().bear.fur || null
+      );
+
+    } else {
+
       drawBear();
+
     }
-  }else{
+
+  } catch (error) {
+
+    console.error(
+      "Firestore error while loading user:",
+      error
+    );
+
     drawBear();
   }
+
+
+  /*
+    User is authenticated,
+    therefore don't leave them on
+    the login page.
+  */
+
+  location.href = "Lootify1.html";
+
 });
 
-window.login = () => {
-  const emailVal = document.getElementById('email').value;
-  const passVal = document.getElementById('pass').value;
-  signInWithEmailAndPassword(auth, emailVal, passVal)
-    .then(async cred => {
-      await setDoc(doc(db,"users",cred.user.uid),{
-        email:cred.user.email,
-        lastLogin:new Date()
-      },{merge:true});
-      location.href="Lootify1.html";
-    }).catch(err=>alert(err.message));
+
+/* =========================
+   EMAIL / PASSWORD LOGIN
+========================= */
+
+window.login = async () => {
+
+  const emailVal =
+    document.getElementById("email").value.trim();
+
+  const passVal =
+    document.getElementById("pass").value;
+
+
+  if (!emailVal || !passVal) {
+
+    alert("Please enter your email and password.");
+
+    return;
+  }
+
+
+  try {
+
+    const cred =
+      await signInWithEmailAndPassword(
+        auth,
+        emailVal,
+        passVal
+      );
+
+
+    /*
+      Authentication succeeded.
+    */
+
+    await setDoc(
+      doc(db, "users", cred.user.uid),
+      {
+        email: cred.user.email,
+        lastLogin: new Date()
+      },
+      {
+        merge: true
+      }
+    );
+
+
+    /*
+      Go to the main Lootify page.
+    */
+
+    location.href = "Lootify1.html";
+
+
+  } catch (error) {
+
+    console.error(
+      "Login error:",
+      error
+    );
+
+    alert(
+      "Login failed:\n" +
+      error.message
+    );
+  }
+
 };
 
-window.googleLogin = () => {
-  signInWithPopup(auth, provider)
-    .then(async cred=>{
-      await setDoc(doc(db,"users",cred.user.uid),{
-        email:cred.user.email,
-        lastLogin:new Date()
-      },{merge:true});
-      location.href="Lootify1.html";
-    }).catch(err=>alert(err.message));
+
+/* =========================
+   GOOGLE LOGIN
+========================= */
+
+window.googleLogin = async () => {
+
+  try {
+
+    const cred =
+      await signInWithPopup(
+        auth,
+        provider
+      );
+
+
+    /*
+      Google authentication succeeded.
+    */
+
+    await setDoc(
+      doc(db, "users", cred.user.uid),
+      {
+        email: cred.user.email,
+        lastLogin: new Date()
+      },
+      {
+        merge: true
+      }
+    );
+
+
+    /*
+      Go to Lootify.
+    */
+
+    location.href = "Lootify1.html";
+
+
+  } catch (error) {
+
+    console.error(
+      "Google login error:",
+      error
+    );
+
+    alert(
+      "Google login failed:\n" +
+      error.message
+    );
+  }
+
 };
 
-// ===== CURSOR =====
-const cursor = document.querySelector(".cursor");
-document.addEventListener("mousemove", e=>{
-  cursor.style.left=e.clientX+"px";
-  cursor.style.top=e.clientY+"px";
-});
-document.querySelectorAll("button,input").forEach(el=>{
-  el.addEventListener("mouseenter",()=>cursor.classList.add("active"));
-  el.addEventListener("mouseleave",()=>cursor.classList.remove("active"));
-});
 
-// ===== PUPILS =====
-const left=document.getElementById("leftPupil");
-const right=document.getElementById("rightPupil");
-const bearWrap=document.querySelector(".bear-login-wrapper");
-left.style.left="38%"; left.style.top="30%";
-right.style.left="77%"; right.style.top="30%";
+/* =========================
+   CURSOR
+========================= */
 
-document.addEventListener("mousemove", e=>{
-  const r=bearWrap.getBoundingClientRect();
-  const dx=e.clientX-(r.left+r.width/2);
-  const dy=e.clientY-(r.top+r.height/2);
-  const a=Math.atan2(dy,dx);
-  const x=Math.cos(a)*8;
-  const y=Math.sin(a)*8;
-  left.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;
-  right.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;
-});
+const cursor =
+  document.querySelector(".cursor");
 
-// ===== PARTICLES =====
-const canvas=document.getElementById("particles");
-const ctx=canvas.getContext("2d");
-function resize(){canvas.width=innerWidth; canvas.height=innerHeight;}
-window.addEventListener("resize",resize); resize();
 
-let particles=[];
-for(let i=0;i<120;i++){
+document.addEventListener(
+  "mousemove",
+  e => {
+
+    cursor.style.left =
+      e.clientX + "px";
+
+    cursor.style.top =
+      e.clientY + "px";
+
+  }
+);
+
+
+document
+  .querySelectorAll("button, input")
+  .forEach(el => {
+
+    el.addEventListener(
+      "mouseenter",
+      () => {
+        cursor.classList.add("active");
+      }
+    );
+
+    el.addEventListener(
+      "mouseleave",
+      () => {
+        cursor.classList.remove("active");
+      }
+    );
+
+  });
+
+
+/* =========================
+   PUPILS
+========================= */
+
+const left =
+  document.getElementById("leftPupil");
+
+const right =
+  document.getElementById("rightPupil");
+
+const bearWrap =
+  document.querySelector(".bear-login-wrapper");
+
+
+left.style.left = "38%";
+left.style.top = "30%";
+
+right.style.left = "77%";
+right.style.top = "30%";
+
+
+document.addEventListener(
+  "mousemove",
+  e => {
+
+    const r =
+      bearWrap.getBoundingClientRect();
+
+    const dx =
+      e.clientX -
+      (r.left + r.width / 2);
+
+    const dy =
+      e.clientY -
+      (r.top + r.height / 2);
+
+    const a =
+      Math.atan2(dy, dx);
+
+    const x =
+      Math.cos(a) * 8;
+
+    const y =
+      Math.sin(a) * 8;
+
+
+    left.style.transform =
+      `translate(-50%,-50%) translate(${x}px,${y}px)`;
+
+    right.style.transform =
+      `translate(-50%,-50%) translate(${x}px,${y}px)`;
+
+  }
+);
+
+
+/* =========================
+   PARTICLES
+========================= */
+
+const canvas =
+  document.getElementById("particles");
+
+const ctx =
+  canvas.getContext("2d");
+
+
+function resize() {
+
+  canvas.width = innerWidth;
+
+  canvas.height = innerHeight;
+
+}
+
+
+window.addEventListener(
+  "resize",
+  resize
+);
+
+resize();
+
+
+let particles = [];
+
+
+for (let i = 0; i < 120; i++) {
+
   particles.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    r:Math.random()*2+1,
-    vx:(Math.random()-0.5)/2,
-    vy:(Math.random()-0.5)/2,
-    color:`hsla(${Math.random()*40+20},35%,80%,0.35)`
+
+    x: Math.random() * canvas.width,
+
+    y: Math.random() * canvas.height,
+
+    r: Math.random() * 2 + 1,
+
+    vx: (Math.random() - 0.5) / 2,
+
+    vy: (Math.random() - 0.5) / 2,
+
+    color:
+      `hsla(${Math.random() * 40 + 20},35%,80%,0.35)`
+
   });
+
 }
 
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  particles.forEach(p=>{
-    p.x+=p.vx; p.y+=p.vy;
-    if(p.x>canvas.width) p.x=0; if(p.x<0) p.x=canvas.width;
-    if(p.y>canvas.height) p.y=0; if(p.y<0) p.y=canvas.height;
+
+function draw() {
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  particles.forEach(p => {
+
+    p.x += p.vx;
+
+    p.y += p.vy;
+
+
+    if (p.x > canvas.width)
+      p.x = 0;
+
+    if (p.x < 0)
+      p.x = canvas.width;
+
+    if (p.y > canvas.height)
+      p.y = 0;
+
+    if (p.y < 0)
+      p.y = canvas.height;
+
+
     ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=p.color;
+
+    ctx.arc(
+      p.x,
+      p.y,
+      p.r,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fillStyle = p.color;
+
     ctx.fill();
+
   });
+
+
   requestAnimationFrame(draw);
+
 }
+
+
 draw();
 
 </script>
+
 </body>
 </html>
